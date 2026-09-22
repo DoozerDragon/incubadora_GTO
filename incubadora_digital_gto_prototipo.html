@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incubadora Digital GTO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        gto: {
+                            blue: '#0a2540',
+                            gold: '#d4af37',
+                            light: '#f8fafc'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f0f4f8; }
+        .screen { display: none; opacity: 0; transition: opacity 0.3s ease-in-out; }
+        .screen.active { display: block; opacity: 1; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        #notification-container {
+            position: fixed; top: 20px; right: 20px; z-index: 1000;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px;}
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Header Institucional -->
+    <header class="gto-header bg-gto-blue text-white shadow-lg z-50 sticky top-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <i class="fas fa-chart-line text-gto-gold text-2xl"></i>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">Incubadora Digital <span class="text-gto-gold">GTO</span></h1>
+                    <p class="text-xs text-gray-300">Gobierno del Estado de Guanajuato</p>
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="toggleDocsModal()" class="text-sm font-medium hover:text-gto-gold transition-colors flex items-center gap-2 border border-white/20 rounded-full px-4 py-2 hover:bg-white/10">
+                    <i class="fas fa-file-alt"></i> Documentación del Proyecto
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenedor de Notificaciones -->
+    <div id="notification-container"></div>
+
+    <!-- Contenido Principal -->
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
+
+        <!-- PANTALLA 1: Bienvenida e Identificación -->
+        <section id="screen-1" class="screen active max-w-2xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+                <div class="bg-gradient-to-r from-gto-blue to-blue-800 p-8 text-center text-white">
+                    <i class="fas fa-rocket text-5xl text-gto-gold mb-4"></i>
+                    <h2 class="text-3xl font-bold mb-2">Bienvenido a la Incubadora Digital GTO</h2>
+                    <p class="text-blue-100 text-sm">Impulsando el ecosistema de innovación y tecnología en nuestro estado.</p>
+                </div>
+                
+                <div class="p-8">
+                    <div class="mb-8">
+                        <h3 class="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">Ingreso de Emprendedor</h3>
+                        <p class="text-sm text-gray-500 mb-6">Inicia sesión con tu CURP o correo electrónico para comenzar el proceso de incubación.</p>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico o CURP</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-user text-gray-400"></i>
+                                    </div>
+                                    <input type="text" value="emprendedor@guanajuato.mx" class="pl-10 w-full rounded-lg border-gray-300 border focus:ring-gto-blue focus:border-gto-blue p-2.5 outline-none transition-shadow" placeholder="ej. correo@dominio.com">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-lock text-gray-400"></i>
+                                    </div>
+                                    <input type="password" value="********" class="pl-10 w-full rounded-lg border-gray-300 border focus:ring-gto-blue focus:border-gto-blue p-2.5 outline-none transition-shadow" placeholder="••••••••">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="navigate('screen-2')" class="w-full bg-gto-blue hover:bg-blue-900 text-white font-bold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group">
+                        <span>Iniciar Postulación de Proyecto</span>
+                        <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                    <p class="text-xs text-center text-gray-400 mt-4">¿No tienes cuenta? <a href="#" class="text-gto-blue font-medium hover:underline">Regístrate aquí</a></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PANTALLA 2: Formulario de Recopilación -->
+        <section id="screen-2" class="screen max-w-4xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 md:p-8">
+                <div class="flex items-center justify-between border-b pb-4 mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gto-blue">Postulación de Proyecto</h2>
+                        <p class="text-sm text-gray-500">Completa la información operativa y estratégica de tu negocio digital.</p>
+                    </div>
+                    <button onclick="navigate('screen-1')" class="text-gray-400 hover:text-gray-700 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <form id="project-form" onsubmit="submitForm(event)">
+                    
+                    <!-- Datos Operativos Básicos -->
+                    <div class="mb-8 bg-gray-50 p-5 rounded-xl border border-gray-100">
+                        <h3 class="text-sm font-bold tracking-wider text-gray-500 uppercase mb-4 flex items-center gap-2">
+                            <i class="fas fa-building"></i> Datos Operativos Básicos
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Negocio/Startup *</label>
+                                <input type="text" id="f-name" required class="w-full rounded-lg border-gray-300 border focus:ring-gto-blue focus:border-gto-blue p-2.5 outline-none" placeholder="Ej. Agrotech GTO">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Giro / Sector *</label>
+                                <select id="f-sector" required class="w-full rounded-lg border-gray-300 border focus:ring-gto-blue focus:border-gto-blue p-2.5 outline-none bg-white">
+                                    <option value="">Selecciona un sector...</option>
+                                    <option value="SaaS / Software">SaaS / Software Enterprise</option>
+                                    <option value="E-commerce">E-commerce / Marketplace</option>
+                                    <option value="Agrotech">Agrotech / Tecnologías Agrícolas</option>
+                                    <option value="Edtech">Edtech / Educación</option>
+                                    <option value="Fintech">Fintech / Servicios Financieros</option>
+                                    <option value="Industria 4.0">Industria 4.0 / IoT</option>
+                                    <option value="Otro">Otro (Digital)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Municipio de Operación *</label>
+                                <select id="f-municipio" required class="w-full rounded-lg border-gray-300 border focus:ring-gto-blue focus:border-gto-blue p-2.5 outline-none bg-white">
+                                    <option value="">Selecciona un municipio...</option>
+                                    <option value="León">León</option>
+                                    <option value="Irapuato">Irapuato</option>
+                                    <option value="Celaya">Celaya</option>
+                                    <option value="Guanajuato">Guanajuato</option>
+                                    <option value="San Miguel de Allende">San Miguel de Allende</option>
+                                    <option value="Silao">Silao</option>
+                                    <option value="Salamanca">Salamanca</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tiempo en el mercado *</label>
+                                <select id="f-time" required class="w-full rounded-lg border-gray-300 border focus:ring-gto-blue focus:border-gto-blue p-2.5 outline-none bg-white">
+                                    <option value="">Selecciona el tiempo...</option>
+                                    <option value="Solo es una idea">Solo es una idea (Fase Pre-Semilla)</option>
+                                    <option value="Menos de 6 meses">Menos de 6 meses (Prototipo/MVP)</option>
+                                    <option value="6 a 12 meses">6 a 12 meses (Primeras ventas)</option>
+                                    <option value="1 a 3 años">1 a 3 años (En crecimiento)</option>
+                                    <option value="Más de 3 años">Más de 3 años (Consolidación)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Investigación de Negocio (Propuesta Estratégica del Equipo) -->
+                    <div class="mb-8 border-l-4 border-gto-gold pl-5 py-2">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-sm font-bold tracking-wider text-gto-blue uppercase flex items-center gap-2">
+                                <i class="fas fa-microscope text-gto-gold"></i> Evaluación Estratégica del Negocio
+                            </h3>
+                            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded border border-blue-200">Sección Crítica</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-5">Estos campos nos ayudarán a determinar la viabilidad y el potencial de escalabilidad de tu proyecto.</p>
+
+                        <div class="space-y-5">
+                            <!-- Pregunta 1: Tracción -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-800 mb-1">1. Tracción y Validación Actual *</label>
+                                <p class="text-xs text-gray-500 mb-2">¿Cuál es tu volumen de ventas mensual actual o número de usuarios activos? Si no tienes, ¿cómo has validado que alguien quiere tu producto?</p>
+                                <textarea id="f-q1" required rows="2" class="w-full rounded-lg border-gray-300 border focus:ring-gto-blue focus:border-gto-blue p-2.5 outline-none resize-none" placeholder="Ej. Tenemos 500 usuarios activos mensuales y facturamos $20,000 MXN..."></textarea>
+                            </div>
+
+                            <!-- Pregunta 2: Modelo de Monetización -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-800 mb-1">2. Modelo de Monetización *</label>
+                                <p class="text-xs text-gray-500 mb-2">¿Cómo hace (o hará) dinero la empresa? (Ej. Suscripción, venta directa, comisión por transacción, freemium, etc.)</p>
+                                <input type="text" id="f-q2" required class="w-full rounded-lg border-gray-300 border focus:ring-gto-blue focus:border-gto-blue p-2.5 outline-none" placeholder="Ej. Modelo B2B SaaS con suscripción mensual de $499 MXN por licencia.">
+                            </div>
+
+                            <!-- Pregunta 3: Ventaja Competitiva -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-800 mb-1">3. Ventaja Competitiva e Innovación *</label>
+                                <p class="text-xs text-gray-500 mb-2">¿Qué hace a tu solución diferente y mejor a lo que ya existe en el mercado? (Propiedad intelectual, tecnología propia, barreras de entrada)</p>
+                                <textarea id="f-q3" required rows="2" class="w-full rounded-lg border-gray-300 border focus:ring-gto-blue focus:border-gto-blue p-2.5 outline-none resize-none" placeholder="Ej. Nuestro algoritmo patentado reduce el uso de agua en un 30% comparado con..."></textarea>
+                            </div>
+
+                            <!-- Pregunta 4: Necesidad de Incubación -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-800 mb-1">4. Objetivo Principal de Incubación *</label>
+                                <p class="text-xs text-gray-500 mb-2">¿Qué recurso de la Incubadora GTO es vital para que tu empresa sobreviva los próximos 12 meses?</p>
+                                <select id="f-q4" required class="w-full rounded-lg border-gray-300 border focus:ring-gto-blue focus:border-gto-blue p-2.5 outline-none bg-white">
+                                    <option value="">Selecciona la necesidad principal...</option>
+                                    <option value="Capital Semilla">Capital Semilla / Financiamiento</option>
+                                    <option value="Mentoría Técnica">Mentoría Técnica Especializada (Desarrollo)</option>
+                                    <option value="Estrategia Comercial">Estrategia Comercial y Ventas B2B</option>
+                                    <option value="Legal y Propiedad Intelectual">Asesoría Legal y Propiedad Intelectual</option>
+                                    <option value="Red de Contactos">Networking e Introducción a Corporativos</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end pt-4 border-t gap-4">
+                        <button type="button" onclick="navigate('screen-1')" class="text-gray-500 bg-white border border-gray-300 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg text-sm font-medium px-5 py-2.5 hover:bg-gray-50 focus:z-10 transition-colors">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="text-white bg-gto-blue hover:bg-blue-900 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-2.5 text-center shadow-md transition-colors flex items-center gap-2">
+                            <i class="fas fa-paper-plane"></i> Enviar Postulación al Comité Directivo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- PANTALLA 3 - VISTA EMPRENDEDOR: Éxito -->
+        <section id="screen-3-user" class="screen max-w-2xl mx-auto text-center mt-10">
+            <div class="bg-white rounded-3xl shadow-2xl p-10 border border-gray-100 transform transition-all">
+                <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-green-100 mb-6">
+                    <i class="fas fa-check text-4xl text-green-600"></i>
+                </div>
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-2">¡Solicitud Recibida!</h2>
+                <p class="text-gray-500 mb-6">Tu proyecto ha sido enviado exitosamente al Comité Directivo de la Incubadora Digital GTO.</p>
+                
+                <div class="bg-gray-50 rounded-xl p-6 mb-8 border border-gray-200">
+                    <p class="text-sm text-gray-500 mb-1">Folio de Seguimiento:</p>
+                    <p id="display-folio" class="text-2xl font-mono font-bold text-gto-blue tracking-wider">GTO-INC-XXXX</p>
+                </div>
+                
+                <p class="text-sm text-gray-600 mb-8">El comité evaluará la información estratégica proporcionada. Recibirás un correo con la resolución en los próximos 5 a 7 días hábiles.</p>
+                
+                <div class="flex flex-col gap-3">
+                    <button onclick="simulateAdminLogin()" class="w-full text-white bg-gto-blue hover:bg-blue-900 font-medium rounded-xl text-sm px-5 py-3.5 text-center transition-colors flex justify-center items-center gap-2">
+                        <i class="fas fa-user-tie"></i> Simular: Ir a la Vista del Comité Directivo
+                    </button>
+                    <button onclick="navigate('screen-1')" class="w-full text-gray-600 bg-white border border-gray-300 hover:bg-gray-50 font-medium rounded-xl text-sm px-5 py-3.5 text-center transition-colors">
+                        Volver al Inicio
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PANTALLA 3 - VISTA COMITÉ DIRECTIVO: Resumen y Decisión -->
+        <section id="screen-3-admin" class="screen max-w-5xl mx-auto">
+            <div class="flex justify-between items-end mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gto-blue flex items-center gap-2">
+                        <i class="fas fa-clipboard-list"></i> Panel de Evaluación
+                    </h2>
+                    <p class="text-sm text-gray-500">Vista del Evaluador del Gobierno (Comité Directivo)</p>
+                </div>
+                <button onclick="navigate('screen-3-user')" class="text-sm text-gto-blue font-medium hover:underline flex items-center gap-1">
+                    <i class="fas fa-arrow-left"></i> Volver a vista emprendedor
+                </button>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                <!-- Status Header -->
+                <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <div class="flex items-center gap-4">
+                        <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-yellow-200 flex items-center gap-1" id="status-badge">
+                            <i class="fas fa-clock"></i> Pendiente de Revisión
+                        </span>
+                        <span class="text-sm font-mono font-medium text-gray-500" id="admin-folio">Folio: -</span>
+                    </div>
+                    <span class="text-sm text-gray-500" id="admin-date">Fecha: -</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-0">
+                    <!-- Left Column: Datos Básicos -->
+                    <div class="p-6 border-r border-gray-100 bg-gray-50/50 md:col-span-1">
+                        <div class="mb-6 text-center md:text-left">
+                            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-gto-blue mb-4">
+                                <i class="fas fa-laptop-code text-2xl"></i>
+                            </div>
+                            <h3 id="admin-name" class="text-xl font-bold text-gray-900 mb-1">Nombre Startup</h3>
+                            <p id="admin-sector" class="text-sm font-medium text-gto-gold">Sector</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase tracking-wider mb-1 font-semibold">Ubicación</p>
+                                <p id="admin-municipio" class="text-sm text-gray-800 flex items-center gap-2">
+                                    <i class="fas fa-map-marker-alt text-gray-400"></i> Municipio, GTO
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase tracking-wider mb-1 font-semibold">Etapa de Madurez</p>
+                                <p id="admin-time" class="text-sm text-gray-800 flex items-center gap-2">
+                                    <i class="fas fa-calendar-alt text-gray-400"></i> Tiempo
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase tracking-wider mb-1 font-semibold">Solicita</p>
+                                <p id="admin-q4" class="text-sm text-gray-800 font-medium bg-white p-2 rounded border inline-block">
+                                    Necesidad
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Investigación Estratégica -->
+                    <div class="p-6 md:col-span-2">
+                        <h4 class="text-lg font-bold text-gray-800 mb-5 border-b pb-2">Respuestas Estratégicas</h4>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <h5 class="text-sm font-semibold text-gto-blue mb-2 flex items-center gap-2">
+                                    <i class="fas fa-chart-bar text-gray-400"></i> Tracción y Validación
+                                </h5>
+                                <div class="bg-gray-50 p-4 rounded-lg text-sm text-gray-700 italic border border-gray-100">
+                                    "<span id="admin-q1">Respuesta 1</span>"
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h5 class="text-sm font-semibold text-gto-blue mb-2 flex items-center gap-2">
+                                    <i class="fas fa-coins text-gray-400"></i> Modelo de Monetización
+                                </h5>
+                                <div class="bg-gray-50 p-4 rounded-lg text-sm text-gray-700 italic border border-gray-100">
+                                    "<span id="admin-q2">Respuesta 2</span>"
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h5 class="text-sm font-semibold text-gto-blue mb-2 flex items-center gap-2">
+                                    <i class="fas fa-lightbulb text-gray-400"></i> Ventaja Competitiva e Innovación
+                                </h5>
+                                <div class="bg-gray-50 p-4 rounded-lg text-sm text-gray-700 italic border border-gray-100">
+                                    "<span id="admin-q3">Respuesta 3</span>"
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de Decisión -->
+                <div class="bg-gray-100 p-4 md:p-6 border-t border-gray-200 flex flex-col md:flex-row justify-end items-center gap-3">
+                    <p class="text-sm text-gray-500 mr-auto hidden md:block">Evaluación final del Comité. Esta acción notificará al emprendedor.</p>
+                    
+                    <button onclick="evaluateProject('rechazado')" class="w-full md:w-auto px-5 py-2.5 rounded-lg text-sm font-medium text-red-600 bg-white border border-red-200 hover:bg-red-50 hover:border-red-300 transition-colors flex items-center justify-center gap-2">
+                        <i class="fas fa-times-circle"></i> Rechazar
+                    </button>
+                    
+                    <button onclick="evaluateProject('info')" class="w-full md:w-auto px-5 py-2.5 rounded-lg text-sm font-medium text-yellow-700 bg-white border border-yellow-300 hover:bg-yellow-50 hover:border-yellow-400 transition-colors flex items-center justify-center gap-2">
+                        <i class="fas fa-exclamation-circle"></i> Solicitar más Info
+                    </button>
+                    
+                    <button onclick="evaluateProject('aprobado')" class="w-full md:w-auto px-6 py-2.5 rounded-lg text-sm font-bold text-white bg-green-600 hover:bg-green-700 shadow-md transition-colors flex items-center justify-center gap-2">
+                        <i class="fas fa-check-circle"></i> ¡Aprobar Proyecto!
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL DE DOCUMENTACIÓN (Requisito del PDF) -->
+    <div id="docs-modal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onclick="toggleDocsModal()"></div>
+        <div class="absolute inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl flex flex-col h-full transform transition-transform translate-x-full duration-300" id="docs-panel">
+            
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gto-blue text-white">
+                <h2 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-folder-open"></i> Documentación</h2>
+                <button onclick="toggleDocsModal()" class="text-gray-300 hover:text-white transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div class="flex-grow overflow-y-auto p-6 custom-scrollbar space-y-8">
+                
+                <!-- Hitos -->
+                <section>
+                    <h3 class="text-sm font-bold text-gto-gold uppercase tracking-wider mb-3">1. Hitos del Proyecto</h3>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <p class="text-sm text-gray-700 mb-2"><strong><i class="fas fa-flag-checkered text-green-600"></i> Hito de Inicio:</strong><br> Reunión Kick-off con el funcionario. El proyecto inicia formalmente con la entrega y firma del <em>Documento de Definición de Requisitos y Arquitectura de Datos</em>.</p>
+                        <p class="text-sm text-gray-700"><strong><i class="fas fa-flag text-red-600"></i> Hito de Cierre:</strong><br> Despliegue del prototipo interactivo (este software). Finaliza con la <em>Prueba de Aceptación del Usuario (UAT)</em> aprobada por el Comité Directivo.</p>
+                    </div>
+                </section>
+
+                <!-- Matriz de Interesados -->
+                <section>
+                    <h3 class="text-sm font-bold text-gto-gold uppercase tracking-wider mb-3">2. Matriz de Interesados</h3>
+                    <div class="overflow-x-auto rounded-lg border border-gray-200">
+                        <table class="w-full text-xs text-left text-gray-500">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                                <tr>
+                                    <th class="px-3 py-2">Interesado</th>
+                                    <th class="px-3 py-2">Poder / Interés</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-white border-b">
+                                    <td class="px-3 py-2 font-medium text-gray-900">Funcionario GTO (Patrocinador)</td>
+                                    <td class="px-3 py-2 text-red-600 font-bold">Alto / Alto</td>
+                                </tr>
+                                <tr class="bg-white border-b">
+                                    <td class="px-3 py-2 font-medium text-gray-900">Comité Directivo (Evaluadores)</td>
+                                    <td class="px-3 py-2 text-red-600 font-bold">Alto / Alto</td>
+                                </tr>
+                                <tr class="bg-white">
+                                    <td class="px-3 py-2 font-medium text-gray-900">Emprendedores (Usuarios)</td>
+                                    <td class="px-3 py-2 text-yellow-600 font-bold">Bajo / Alto</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Asignación y Dependencias -->
+                <section>
+                    <h3 class="text-sm font-bold text-gto-gold uppercase tracking-wider mb-3">3. Asignación y Dependencias</h3>
+                    <ul class="space-y-3 text-sm text-gray-700">
+                        <li class="flex gap-2 items-start"><i class="fas fa-tasks text-gto-blue mt-1"></i> <div><strong>Project Manager:</strong> Define la matriz, hitos y coordina entregas.</div></li>
+                        <li class="flex gap-2 items-start"><i class="fas fa-search text-gto-blue mt-1"></i> <div><strong>Especialista Negocios:</strong> Investiga y define las preguntas clave (Pantalla 2). <em>Depende del brief del PM.</em></div></li>
+                        <li class="flex gap-2 items-start"><i class="fas fa-paint-brush text-gto-blue mt-1"></i> <div><strong>Diseñador UX/UI:</strong> Diseña las vistas. <em>Depende del especialista de negocios para conocer los campos.</em></div></li>
+                        <li class="flex gap-2 items-start"><i class="fas fa-code text-gto-blue mt-1"></i> <div><strong>Desarrollador:</strong> Programa el prototipo. <em>Depende de los diseños UX/UI finalizados.</em></div></li>
+                    </ul>
+                </section>
+
+                <!-- Justificación de Datos -->
+                <section>
+                    <h3 class="text-sm font-bold text-gto-gold uppercase tracking-wider mb-3">4. Justificación de Datos (Pantalla 2)</h3>
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 text-sm text-gray-700 italic">
+                        "Elegimos pedir <strong>Tracción, Monetización, Innovación y Objetivo</strong> porque en modelos digitales de alto riesgo, una simple 'idea' no basta. El Gobierno necesita saber si el producto tiene validación de mercado (Tracción) y cómo será rentable (Monetización) para garantizar que el recurso público de la incubadora (Objetivo) se invierta en proyectos con potencial real de supervivencia."
+                    </div>
+                </section>
+            </div>
+            
+            <div class="p-4 border-t bg-gray-50">
+                <button onclick="toggleDocsModal()" class="w-full text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 rounded-lg transition-colors">
+                    Cerrar Documentación
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ESTADO DE LA APLICACIÓN
+        const AppState = {
+            currentFolio: '',
+            submissionData: null
+        };
+
+        // NAVEGACIÓN ENTRE PANTALLAS
+        function navigate(screenId) {
+            // Ocultar todas las pantallas
+            document.querySelectorAll('.screen').forEach(el => {
+                el.classList.remove('active', 'fade-in');
+            });
+            
+            // Mostrar la seleccionada
+            const target = document.getElementById(screenId);
+            target.classList.add('active', 'fade-in');
+
+            // Scroll al inicio
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // CONTROL DEL MODAL DE DOCUMENTACIÓN
+        function toggleDocsModal() {
+            const modal = document.getElementById('docs-modal');
+            const panel = document.getElementById('docs-panel');
+            
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                // Timeout para permitir que display:block aplique antes de la transición
+                setTimeout(() => {
+                    panel.classList.remove('translate-x-full');
+                }, 10);
+            } else {
+                panel.classList.add('translate-x-full');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 300); // esperar a que termine la animación
+            }
+        }
+
+        // GENERAR FOLIO ALEATORIO
+        function generateFolio() {
+            const num = Math.floor(1000 + Math.random() * 9000);
+            return `GTO-INC-${num}`;
+        }
+
+        // MANEJO DEL FORMULARIO (Pantalla 2 a 3 User)
+        function submitForm(event) {
+            event.preventDefault();
+
+            // 1. Recopilar datos
+            AppState.submissionData = {
+                name: document.getElementById('f-name').value,
+                sector: document.getElementById('f-sector').value,
+                municipio: document.getElementById('f-municipio').value,
+                time: document.getElementById('f-time').value,
+                q1_traction: document.getElementById('f-q1').value,
+                q2_monetization: document.getElementById('f-q2').value,
+                q3_innovation: document.getElementById('f-q3').value,
+                q4_objective: document.getElementById('f-q4').value,
+                date: new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })
+            };
+
+            // 2. Generar y guardar folio
+            AppState.currentFolio = generateFolio();
+
+            // 3. Actualizar UI Pantalla 3-User
+            document.getElementById('display-folio').textContent = AppState.currentFolio;
+
+            // 4. Navegar
+            navigate('screen-3-user');
+            
+            // Notificación flotante
+            showNotification('Proyecto enviado correctamente. Revisa tu folio.', 'success');
+        }
+
+        // SIMULACIÓN: IR A VISTA ADMIN (Pantalla 3 Admin)
+        function simulateAdminLogin() {
+            if (!AppState.submissionData) {
+                showNotification('No hay datos para evaluar.', 'error');
+                return;
+            }
+
+            const data = AppState.submissionData;
+
+            // Poblar la vista del administrador
+            document.getElementById('admin-folio').textContent = `Folio: ${AppState.currentFolio}`;
+            document.getElementById('admin-date').textContent = `Fecha: ${data.date}`;
+            
+            document.getElementById('admin-name').textContent = data.name;
+            document.getElementById('admin-sector').textContent = data.sector;
+            document.getElementById('admin-municipio').innerHTML = `<i class="fas fa-map-marker-alt text-gray-400"></i> ${data.municipio}, GTO`;
+            document.getElementById('admin-time').innerHTML = `<i class="fas fa-calendar-alt text-gray-400"></i> ${data.time}`;
+            document.getElementById('admin-q4').textContent = data.q4_objective;
+            
+            document.getElementById('admin-q1').textContent = data.q1_traction;
+            document.getElementById('admin-q2').textContent = data.q2_monetization;
+            document.getElementById('admin-q3').textContent = data.q3_innovation;
+
+            // Resetear status visual
+            const badge = document.getElementById('status-badge');
+            badge.className = "bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-yellow-200 flex items-center gap-1";
+            badge.innerHTML = '<i class="fas fa-clock"></i> Pendiente de Revisión';
+
+            navigate('screen-3-admin');
+        }
+
+        // ACCIONES DEL COMITÉ
+        function evaluateProject(status) {
+            const badge = document.getElementById('status-badge');
+            
+            if (status === 'aprobado') {
+                badge.className = "bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-green-200 flex items-center gap-1 fade-in";
+                badge.innerHTML = '<i class="fas fa-check-circle"></i> Proyecto Aprobado';
+                showNotification('¡Has aprobado el proyecto! El emprendedor será notificado.', 'success');
+            } 
+            else if (status === 'rechazado') {
+                badge.className = "bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-red-200 flex items-center gap-1 fade-in";
+                badge.innerHTML = '<i class="fas fa-times-circle"></i> Proyecto Rechazado';
+                showNotification('Proyecto rechazado. El caso ha sido cerrado.', 'error');
+            }
+            else if (status === 'info') {
+                badge.className = "bg-orange-100 text-orange-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-orange-200 flex items-center gap-1 fade-in";
+                badge.innerHTML = '<i class="fas fa-info-circle"></i> En Revisión - Faltan Datos';
+                showNotification('Se ha enviado un correo al emprendedor solicitando más información.', 'info');
+            }
+        }
+
+        // SISTEMA DE NOTIFICACIONES PERSONALIZADO (Evitando alert)
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notification-container');
+            
+            const notif = document.createElement('div');
+            
+            // Clases base
+            let classes = "flex items-center p-4 mb-4 text-sm rounded-lg shadow-lg transform transition-all duration-300 translate-x-full border-l-4 ";
+            
+            // Colores por tipo
+            if (type === 'success') {
+                classes += "bg-green-50 text-green-800 border-green-500";
+                icon = '<i class="fas fa-check-circle mr-2 text-lg"></i>';
+            } else if (type === 'error') {
+                classes += "bg-red-50 text-red-800 border-red-500";
+                icon = '<i class="fas fa-exclamation-circle mr-2 text-lg"></i>';
+            } else {
+                classes += "bg-blue-50 text-blue-800 border-blue-500";
+                icon = '<i class="fas fa-info-circle mr-2 text-lg"></i>';
+            }
+            
+            notif.className = classes;
+            notif.innerHTML = `${icon} <div>${message}</div>`;
+            
+            container.appendChild(notif);
+            
+            // Animar entrada
+            requestAnimationFrame(() => {
+                notif.classList.remove('translate-x-full');
+            });
+            
+            // Eliminar después de 3.5s
+            setTimeout(() => {
+                notif.style.opacity = '0';
+                setTimeout(() => notif.remove(), 300);
+            }, 3500);
+        }
+
+    </script>
+</body>
+</html>
